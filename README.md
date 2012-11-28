@@ -27,7 +27,7 @@ Open the newly download chromium browser and go to http://localhost:5000
 
 ## Examples
 
-A working version of the app is available at: 
+A working version of the app is available at: http://noded-voice.herokuapp.com  Remember to use the just downloaded chromium browser
 
 ## Credits
 
