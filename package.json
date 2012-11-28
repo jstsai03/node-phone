@@ -12,5 +12,7 @@
     "passport-att-alpha": "~0.1.4",
     "passport": "~0.1.15",
     "session-mongoose": "0.0.7",
+    "request": "~2.12.0",
+    "mongoose": "~3.4.0"
   }
 }
