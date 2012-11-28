@@ -1,0 +1,18 @@
+div#index(data-role='page')
+  div(data-role='header')
+    h1 Welcome to Noded Voice
+    a.ui-btn-right(href='/auth', rel="external", data-icon='plus') Login
+
+  div#splash()
+    img(src="/images/tfgLogo.jpeg", alt="Think Create Share")
+
+  div.ui-bar(data-role='footer', data-position='fixed')
+    a(href='#info-dialog', data-icon='info', data-rel='dialog') About
+
+div#info-dialog(data-role='page')
+  div(data-role='header')
+    h1 About
+  div(data-role='content')
+    p
+    | This is a WebRTC web Application using Node.js, jQuery Mobile, MongoDB, mongoose, express and jade.
+

@@ -1,0 +1,16 @@
+{
+  "name": "noded-voice",
+  "version": "0.0.1",
+  "private": true,
+  "engines": {
+    "node": "0.8.x",
+    "npm": "1.1.x"
+  },
+  "dependencies": {
+    "express": "2.5.0",
+    "jade": ">= 0.0.1",
+    "passport-att-alpha": "~0.1.4",
+    "passport": "~0.1.15",
+    "session-mongoose": "0.0.7",
+  }
+}

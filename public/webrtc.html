@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sample Phonecall with H2S/phono via WebRTC</title>
+    <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+    <script src="h2s-phono-v2.js"></script>
+    <script>
+      // configure
+      function register(accessToken, callback) {
+        window.phono = $.phono({
+          server: 'https://api.foundry.att.com/a1/webrtc',
+          apiKey: "oauth " + accessToken, 
+          video: false,
+          onReady: function() {
+            console.log('Ready to make a call');
+            if (callback) callback();
+          },
+          phone: {
+            onIncomingCall: function(evt) {
+              window.activecall = evt.call;
+            },
+            onHangup: function(evt) {
+              console.log('Call ended');
+            }
+          }
+        });
+      }
+
+      // create a new call
+      function call(phoneNumber) {
+        console.log('trying to call: ' + phoneNumber);
+        window.activecall = phono.phone.dial("sip:" + phoneNumber + "@vims1.com" , {
+          onRing: function() {
+            console.log('ringing...');
+          },
+          onAnswer: function() {
+            console.log('answered');
+          },
+          onHangup: function() {
+            console.log('call hungup');
+          },
+          onError: function() {
+          },
+          onAddStream: function(e) {
+          }
+        });
+      }    
+
+      // jquery's dom-ready handler
+      $(function () {
+        // here you'll need to include your oauth access token
+        register('9b37ba92423f9cc580ffb456d4108042', function () {
+          // the number to call
+          call('12147178973');
+        });
+      });
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
