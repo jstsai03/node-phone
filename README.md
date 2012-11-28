@@ -6,18 +6,18 @@ The WebRTC browser implementations are still evolving, so for now you have to st
 
 ## Pre-requisites
 
-mongodb installed
-a working node.js environment
-The special chromium browser downloaded and installed
+mongodb installed  
+a working node.js environment  
+The special chromium browser downloaded and installed  
 
 ## Installation
 
-Download the git repository.
-git clone git@github.com:att-innovate/noded-voice.git
-cd into the repo and run npm install
-You will need to define an app in apimatrix.tfoundry.com
-Edit the file .env.sh.txt, adding your newly created client id and client secret from your app in apimatrix and then rename the file to .env.sh
-Source the file to set the environment variables - source .env.sh
+Download the git repository.  
+git clone git@github.com:att-innovate/noded-voice.git  
+cd into the repo and run npm install  
+You will need to define an app in apimatrix.tfoundry.com  
+Edit the file .env.sh.txt, adding your newly created client id and client secret from your app in apimatrix and then rename the file to .env.sh  
+Source the file to set the environment variables - source .env.sh  
 
 Start mongodb.  Example - mongod --dbpath /tmp &
 
