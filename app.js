@@ -6,6 +6,9 @@ var express = require('express')
 
 var mongoStore = require('session-mongoose');
 
+var express = require('express');
+var app = module.exports = express.createServer();
+
 var mongoUri = process.env.MONGOHQ_URL || 'mongodb://localhost/users';
 
 var mongooseSessionStore = new mongoStore({
@@ -16,8 +19,10 @@ var mongooseSessionStore = new mongoStore({
 
 var clientId = process.env.ATT_CLIENT_ID;
 var clientSecret = process.env.ATT_CLIENT_SECRET;
+var callbackUrl = process.env.CALLBACK_URL;
 console.log("clientId=" + clientId);
 console.log("clientSecret=" + clientSecret);
+console.log("callbackUrl=" + callbackUrl);
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -42,7 +47,7 @@ passport.deserializeUser(function(obj, done) {
 passport.use(new AttAlphaStrategy({
     clientID: clientId,
     clientSecret: clientSecret,
-    callbackURL: "http://localhost:5000/users/auth/att/callback",
+    callbackURL: callbackUrl,
     passReqToCallback: true
   },
   function(req, accessToken, refreshToken, profile, done) {
@@ -60,12 +65,6 @@ passport.use(new AttAlphaStrategy({
   }
 ));
 
-
-/**
- * Module dependencies.
- */
-var express = require('express');
-var app = module.exports = express.createServer();
 
 // Configuration
 
