@@ -2,13 +2,25 @@
 
 This example app uses module passport-att-alpha to handle oauth with AT&T alpha API program at apimatrix.tfoundry.com.
 It then uses the WebRTC API's to enable WebRTC calling from a browser.
-The WebRTC browser implementations are still evolving, so for now you have to start by down-loading a version of the Chromium browser. For all instructions and more information please visit here and go to the tutorial tab - https://apimatrix.tfoundry.com/services/webrtc
+The WebRTC browser implementations are still evolving, so for now you have to start by down-loading a version of the Chromium browser, from here http://d2dx.com/leif121015/
+If you're using a Mac, you also have to download boost.zip from http://d2dx.com/boost.zip and unzip it into "/opt/local/lib/".
+
 
 ## Pre-requisites
 
 mongodb installed  
 a working node.js environment  
 The special chromium browser downloaded and installed  
+An active account on http://apimatrix.tfoundry.com and a newly created app  
+
+## How to Create an App on http://apimatrix.tfoundry.com
+
+To create an app login to apimatrix.  
+Click My Apps,  
+Click Register a New App.  
+Complete name, description (mandatory).  
+For the callback url use "http://localhost:5000/users/auth/att/callback"  
+Click Register App
 
 ## Installation
 
