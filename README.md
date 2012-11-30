@@ -2,9 +2,8 @@
 
 This example app uses module passport-att-alpha to handle oauth with AT&T alpha API program at apimatrix.tfoundry.com.
 It then uses the WebRTC API's to enable WebRTC calling from a browser.
-The WebRTC browser implementations are still evolving, so for now you have to start by down-loading a version of the Chromium browser, from here http://d2dx.com/leif121015/
-If you're using a Mac, you also have to download boost.zip from http://d2dx.com/boost.zip and unzip it into "/opt/local/lib/".
-
+The WebRTC browser implementations are still evolving, so for now you have to start by down-loading a version of the Chromium browser, from here  http://js.webphone.tfoundry.com//leif121015/
+If you're using a Mac, you also have to download boost.zip from the above link and unzip it into "/opt/local/lib/".
 
 ## Pre-requisites
 
