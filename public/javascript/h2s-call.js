@@ -1,4 +1,5 @@
-sipdomain = "vims1.com";
+// sipdomain = "vims1.com";
+sipdomain = "mon.api.att.net";
 server = "https://api.foundry.att.com/a1/webrtc";
 
 function formatPhone(phonenum) {
