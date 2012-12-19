@@ -406,7 +406,7 @@ ms.onready = function(evt) {
 		@private
 		*/
 		this._accessToken = (authentication.indexOf("oauth ") == 0) ? authentication.substring(6, authentication.length) : null;
-    
+		
 		/**
 		@field state
 		Object's state

@@ -1,6 +1,5 @@
-// sipdomain = "vims1.com";
-sipdomain = "mon.api.att.net";
-server = "https://api.foundry.att.com/a1/webrtc";
+sipdomain = "vims1.com";
+server = "https://api.foundry.att.com/a2/webrtc";
 
 function formatPhone(phonenum) {
   var regexObj = /^(?:\+?1[-. ]?)?(?:\(?([0-9]{3})\)?[-. ]?)?([0-9]{3})[-. ]?([0-9]{4})$/;
