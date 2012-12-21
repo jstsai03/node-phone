@@ -2358,6 +2358,19 @@ call.transferto(transferaddress);
 	Call.prototype._sendSignaling = function(type, sdp) {
 		var _call = this;
 		var url = this._url;
+
+    //
+    // GEOFF HACK TO FIX direct wcg event coming from apigee g/w
+    // DO NOT LEAVE AS IS
+    // Replace "https://api.foundry.att.com/HaikuServlet/rest/v2/session/xxx/audiovideo/yyy with
+    // Replace "APIGEE SERVER/session/xxx/audiovideo/yyy 
+    if(url.indexOf("HaikuServlet") != -1) {
+      logger.log("Rewriting url from: " + url);
+      url = url.replace(/^.*\/session\/.*\//, _call._mediaServices._gwUrl);
+      logger.log("to: " + url);
+      this._url = url;
+    }
+
 		console.log("Sending " + type + " with SDP: " + sdp);
 		if (type == "OFFER" || type == "offer") {
 			if(this._modID != null){
@@ -2442,16 +2455,6 @@ call.transferto(transferaddress);
 			
 			var req = new _CreateXmlHttpReq();
 			
-      // GEOFF HACK TO FIX direct wcg event coming from apigee g/w
-      // DO NOT LEAVE AS IS
-      // Replace "https://api.foundry.att.com/HaikuServlet/rest/v2/session/xxx/audiovideo/yyy with
-      // Replace "APIGEE SERVER/session/xxx/audiovideo/yyy 
-      if(url.indexOf("HaikuServlet") != -1) {
-        logger.log("Rewriting url from: " + url);
-        url = url.replace(/^.*\/audiovideo\//, _call._mediaServices._gwUrl + 'audiovideo/');
-        logger.log("to: " + url);
-      }
-
 			req.open("POST", url, true);
 			req.setRequestHeader("Content-Type", "application/json");
 			req.setRequestHeader("Accept", "application/json, text/html");
