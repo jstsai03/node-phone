@@ -2446,7 +2446,7 @@ call.transferto(transferaddress);
       // DO NOT LEAVE AS IS
       // Replace "https://api.foundry.att.com/HaikuServlet/rest/v2/session/xxx/audiovideo/yyy with
       // Replace "APIGEE SERVER/session/xxx/audiovideo/yyy 
-      if(url != null) && (url.indexOf("HaikuServlet") != -1) {
+      if(url.indexOf("HaikuServlet") != -1) {
         logger.log("Rewriting url from: " + url);
         url = url.replace(/^.*\/v2\//, this._mt.server + '/');
         logger.log("to: " + url);
