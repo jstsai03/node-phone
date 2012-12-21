@@ -352,7 +352,7 @@ ms.onready = function(evt) {
 	MediaServices = function(gwUrl, username, authentication, services) {
 		var _state = MediaServices.State.INITIALISED,
 			_services = services,
-			_turnConfig = "NONE",
+			_turnConfig = "STUN:206.18.171.164:5060",
 			_username = username;
 		
 		/**
