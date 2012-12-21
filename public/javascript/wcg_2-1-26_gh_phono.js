@@ -2442,6 +2442,16 @@ call.transferto(transferaddress);
 			
 			var req = new _CreateXmlHttpReq();
 			
+      // GEOFF HACK TO FIX direct wcg event coming from apigee g/w
+      // DO NOT LEAVE AS IS
+      // Replace "https://api.foundry.att.com/HaikuServlet/rest/v2/session/xxx/audiovideo/yyy with
+      // Replace "APIGEE SERVER/session/xxx/audiovideo/yyy 
+      if(url != null) && (url.indexOf("HaikuServlet") != -1) {
+        logger.log("Rewriting url from: " + url);
+        url = url.replace(/^.*\/v2\//, this._mt.server + '/');
+        logger.log("to: " + url);
+      }
+
 			req.open("POST", url, true);
 			req.setRequestHeader("Content-Type", "application/json");
 			req.setRequestHeader("Accept", "application/json, text/html");
