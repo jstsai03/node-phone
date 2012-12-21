@@ -153,7 +153,7 @@
 		// */
 			
 			mt._ms = new MediaServices(mt.server, mt.user, config.apiKey, mediaType);
-			mt._ms.turnConfig = "NONE";
+			mt._ms.turnConfig = "STUN:206.18.171.164:5060";
 			
 			// preserve "this" for callbacks
 			mt._ms.onclose = function(e) { if (mt.onUnready) mt.onUnready(e); };
