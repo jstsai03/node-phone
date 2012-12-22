@@ -2366,7 +2366,7 @@ call.transferto(transferaddress);
     // Replace "APIGEE SERVER/session/xxx/audiovideo/yyy 
     if(url.indexOf("HaikuServlet") != -1) {
       logger.log("Rewriting url from: " + url);
-      url = url.replace(/^.*\/session\/.*\//, _call._mediaServices._gwUrl);
+      url = url.replace(/^.*\/session\/.*\/\//, _call._mediaServices._gwUrl);
       logger.log("to: " + url);
       this._url = url;
     }
