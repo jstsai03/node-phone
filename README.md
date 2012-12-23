@@ -1,5 +1,7 @@
 # Noded-Voice
 
+This uses att.js to abstract away from backend and provide config choices for a1, a2 and a3 endpoints
+
 This example app uses module passport-att-alpha to handle oauth with AT&T alpha API program at apimatrix.tfoundry.com.
 It then uses the WebRTC API's to enable WebRTC calling from a browser.
 The WebRTC browser implementations are still evolving, so for now you have to start by down-loading a version of the Chromium browser, from here  http://js.webphone.tfoundry.com//leif121015/
