@@ -1,7 +1,6 @@
 // sipdomain = "vims1.com";
 sipdomain = "mon.api.att.net";
 server = "https://api.foundry.att.com/a1/webrtc";
-stun = "STUN:206.18.171.164:5060";
 
 function formatPhone(phonenum) {
   var regexObj = /^(?:\+?1[-. ]?)?(?:\(?([0-9]{3})\)?[-. ]?)?([0-9]{3})[-. ]?([0-9]{4})$/;
@@ -22,9 +21,8 @@ function login(num, vnum)
 {
   selfnumber.textContent = vnum;
   self.num = num;
-  self.phono = $.phone({
+  self.phono = $.phono({
         server: server,
-        sipdomain: sipdomain,
         apiKey: "oauth " + num,
         video: false,
         
@@ -54,7 +52,6 @@ function login(num, vnum)
 
       });
       
-  self.phono.login(num, '');
   $.mobile.changePage($("#logging-in"));
 }
 
@@ -109,9 +106,8 @@ function do_call()
 function make_call(num)
 {
 
-  // $(".remote-user").text(formatPhone(num));
-  // self.call = phono.phone.dial("sip:"+num + "@" + sipdomain, {
-  self.call = phono.dial(num, {
+  $(".remote-user").text(formatPhone(num));
+  self.call = phono.phone.dial("sip:"+num + "@" + sipdomain, {
     onRing: function() {
       
     },
