@@ -100,13 +100,7 @@ app.configure('production', function(){
 
 app.get('/', function(req, res) {
   console.log("root page");
-  var version = req.param("version");
-  if(version) {
-    req.session.version = version;
-    req.logout();
-  } else {
-    res.render('login');
-  }
+  res.render('login');
 });
 
 app.get('putbacktologgedin', function(req, res) {
