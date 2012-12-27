@@ -100,6 +100,10 @@ app.configure('production', function(){
 
 app.get('/', function(req, res) {
   console.log("root page");
+  var version = req.param("version");
+  if(version) {
+    req.session.version = version;
+  }
   res.render('login');
 });
 
