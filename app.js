@@ -100,10 +100,16 @@ app.configure('production', function(){
 
 app.get('/', function(req, res) {
   console.log("root page");
-  res.render('login');
+  var version = req.param("version");
+  if(version) {
+    req.session.version = version;
+    req.logout();
+  } else {
+    res.render('login');
+  }
 });
 
-app.get('/loggedin', function(req, res) {
+app.get('putbacktologgedin', function(req, res) {
   console.log("loggedin page");
   if(req.user){
     var url = 'https://auth.tfoundry.com/me.json?access_token=' + req.session.alphaAccessToken;
@@ -114,9 +120,32 @@ app.get('/loggedin', function(req, res) {
         console.log(body);
         console.log(obj);
         console.log(req.session.selfNumber);
-        res.render('main', { accessToken: req.session.alphaAccessToken, selfNumber: req.session.selfNumber });
+        res.render('skeleton', { version : req.session.version, accessToken: req.session.alphaAccessToken, selfNumber: req.session.selfNumber });
       } else {
         console.error('me.json error');
+        res.render('login');
+      }
+    })
+  } else {
+    res.render('login');
+  }
+});
+
+
+app.get('/loggedin', function(req, res) {
+  console.log("skeleton page");
+  if(req.user){
+    var url = 'https://auth.tfoundry.com/me.json?access_token=' + req.session.alphaAccessToken;
+    request(url, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        var obj = JSON.parse(body);
+        req.session.selfNumber = obj.virtual_identifiers.mobile[0];
+        console.log(body);
+        console.log(obj);
+        console.log(req.session.selfNumber);
+        res.render('skeleton', { version : req.session.version, accessToken: req.session.alphaAccessToken, selfNumber: req.session.selfNumber });
+      } else {
+        console.error('skeleton me.json error');
         res.render('login');
       }
     })
@@ -134,16 +163,38 @@ app.get('/auth',
   passport.authenticate('att-alpha', { scope: ['webrtc'] }));
 
 // GET /users/auth/att/callback
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  If authentication fails, the user will be redirected back to the
-//   login page.  Otherwise, the primary route function function will be called,
-//   which, in this example, will redirect the user to the home page.
+// Callback for main app
 app.get('/users/auth/att/callback', 
-  passport.authenticate('att-alpha', { successRedirect: '/loggedin',
-                                     failureRedirect: '/' }));
+  passport.authenticate('att-alpha'), 
+  function(req, res){
+    var versionTxt = req.session.version;
+    if(versionTxt) {
+      versionTxt = '?version=' + versionTxt;
+    } else {
+      versionTxt = '';
+    }
+    res.redirect('/loggedin' + versionTxt );
+  });
+
+// GET /users/auth/att/callbackskeleton
+// Callback for skeleton testing
+app.get('/users/auth/att/callbackskeleton', 
+  passport.authenticate('att-alpha'), 
+  function(req, res){
+    var versionTxt = req.session.version;
+    if(versionTxt) {
+      versionTxt = '?version=' + versionTxt;
+    } else {
+      versionTxt = '';
+    }
+    res.redirect('/skeleton' + versionTxt );
+  });
 
 app.get('/logout', function(req, res){
+  console.log("logout");
   req.logout();
+  req.session.destroy();
+  res.cookie('connect.sid', '', {expires: new Date(1), path: '/' });
   res.redirect('/');
 });
 
