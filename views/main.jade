@@ -10,14 +10,15 @@
     h2#status
     | Enter Phone Number:
     input#remote_number(type='text', value='800-444-4444')
-    input#call.button(type='button', disabled='true', value='Loading...')
-    input#answer.button(type='button', disabled='true', value='Answer...')
-    input#reject.button(type='button', disabled='true', value='Reject...')
-    input#hangup.button(type='button', disabled='true', value='End Call...')
-    input#hold.button(type='button', disabled='true', value='Place on Hold...')
+    input#call(type='button', disabled='true', value='Loading...')
+    input#answer(type='button', disabled='true', value='Answer...')
+    input#reject(type='button', disabled='true', value='Reject...')
+    input#hangup(type='button', disabled='true', value='End Call...')
+    input#hold(type='button', disabled='true', value='Place on Hold...')
+    input#retrieve(type='button', disabled='true', value='Retrieve Call...')
     | Transfer Number:
     input#remote_number(type='text')
-    input#hold.button(type='button', disabled='true', value='Transfer...')
+    input#transfer(type='button', disabled='true', value='Transfer...')
   div(data-role='footer')
     h5 AT&T and Ericsson
     a(href='#info-dialog', data-icon='info', data-rel='dialog') About
@@ -38,13 +39,9 @@ script
   var att;
   var call;
   var a3Key = "75150d708376b91aa5a6119d833b8f3e";
-
   if(version && version == "a3") {
-    $("#selfnumber").html("Phono: XXXXXX");
     accessToken = a3Key;
-  } else {
-    $("#selfnumber").html(selfNumber);
-  }
+  } 
 
   function activateButton(sel, txt) {
     if(txt) {
@@ -59,6 +56,13 @@ script
     sel.button("refresh");
   };
 
+  function hangupReset() {
+    activateButton($("#call"));
+    deactivateButton($("#hangup"));
+    deactivateButton($("#hold"));
+    $("#status").html("Make a Call");
+  }
+
   $( '#skelPage' ).live( 'pageinit',function(event){
     console.log("pageinit ready");
     att = $.att({
@@ -66,6 +70,10 @@ script
       apiKey: accessToken,
       onReady: function() {
         console.log("att on ready...");
+        if(version && version == "a3") {
+          selfNumber = "sip:" + this.sessionId;
+        } 
+        $("#selfnumber").html(selfNumber);
         activateButton($("#call"), "Call");
         $("#status").html("Make a Call");
       },
@@ -94,16 +102,18 @@ script
   $("#call").click(function(event) {
     
     var number = $("#remote_number").val();
-    att.phone.dial(number, {
+    call = att.phone.dial(number, {
       onRing: function() {
         $("#status").html("Ringing");
       },
       onAnswer: function() {
-        $("#status").html("Answered");
+        $("#status").html("Active Call");
+        activateButton($("#hold"));
       },
       onHangup: function() {
-        $("#call").attr("disabled", false).val("Call");
-        $("#status").html("Hangup");
+        console.log("Hangup Call...");
+        call.hangup();
+        hangupReset();
       },
       onError: function() {
         console.log("Call Error");
@@ -117,6 +127,8 @@ script
     console.log("Answer Call...");
     call.answer();
     activateButton($("#hangup"));
+    activateButton($("#hold"));
+    deactivateButton($("#reject"));
     deactivateButton($("#answer"));
     $("#status").html("Active Call");
   });
@@ -124,18 +136,31 @@ script
   $("#reject").click(function(event) {
     console.log("Reject Call...");
     call.hangup();
-    activateButton($("#call"));
-    deactivateButton($("#hangup"));
-    deactivateButton($("#answer"));
-    $("#status").html("Make a Call");
+    hangupReset();
   });
 
   $("#hangup").click(function(event) {
     console.log("Hangup Call...");
     call.hangup();
-    activateButton($("#call"));
+    hangupReset();
+  });
+
+  $("#hold").click(function(event) {
+    console.log("Hold Call...");
+    call.hold(true);
     deactivateButton($("#hangup"));
-    $("#status").html("Make a Call");
+    deactivateButton($("#hold"));
+    activateButton($("#retrieve"));
+    $("#status").html("Call on Hold...");
+  });
+
+  $("#retrieve").click(function(event) {
+    console.log("Retrieve Call...");
+    call.hold(false);
+    activateButton($("#hangup"));
+    activateButton($("#hold"));
+    deactivateButton($("#retrieve"));
+    $("#status").html("Active Call...");
   });
 
   $("#logout-btn").bind('click', function(e) {

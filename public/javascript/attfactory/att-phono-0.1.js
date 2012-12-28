@@ -107,6 +107,12 @@
     };
     
     phoneNumber.getCallable = function (input, countryAbr) {
+      
+        // allow a sip address of any format
+        if(input.indexOf('sip:') != -1) {
+          return input;
+        }
+
         var country = countryAbr || 'us',
             cleaned = phoneNumber.parse(input);
         if (cleaned.length === 10) {

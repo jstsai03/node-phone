@@ -94,7 +94,7 @@
     PhonoCall.prototype.pushToTalk = function() { };
     PhonoCall.prototype.talking = function() { };
     PhonoCall.prototype.mute = function() { };
-    PhonoCall.prototype.hold = function() { };
+    PhonoCall.prototype.hold = function(state) { if (state) { this.call.hold() } else { this.call.resume() } };
     PhonoCall.prototype.volume = function() { };
     PhonoCall.prototype.gain = function() { };
     

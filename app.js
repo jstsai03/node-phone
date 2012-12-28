@@ -145,6 +145,7 @@ app.get('/users/auth/att/callback',
     var versionTxt = req.session.version;
     if(versionTxt) {
       versionTxt = '?version=' + versionTxt;
+      req.session.version = null;
     } else {
       versionTxt = '';
     }
@@ -154,8 +155,6 @@ app.get('/users/auth/att/callback',
 app.get('/logout', function(req, res){
   console.log("logout");
   req.logout();
-  req.session.destroy();
-  res.cookie('connect.sid', '', {expires: new Date(1), path: '/' });
   res.redirect('/');
 });
 

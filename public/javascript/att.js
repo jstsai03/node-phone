@@ -94,7 +94,7 @@
     PhonoCall.prototype.pushToTalk = function() { };
     PhonoCall.prototype.talking = function() { };
     PhonoCall.prototype.mute = function() { };
-    PhonoCall.prototype.hold = function() { };
+    PhonoCall.prototype.hold = function(state) { if (state) { this.call.hold() } else { this.call.resume() } };
     PhonoCall.prototype.volume = function() { };
     PhonoCall.prototype.gain = function() { };
     
@@ -21575,6 +21575,12 @@ contact.onupdating = function(evt) {
     };
     
     phoneNumber.getCallable = function (input, countryAbr) {
+      
+        // allow a sip address of any format
+        if(input.indexOf('sip:') != -1) {
+          return input;
+        }
+
         var country = countryAbr || 'us',
             cleaned = phoneNumber.parse(input);
         if (cleaned.length === 10) {
