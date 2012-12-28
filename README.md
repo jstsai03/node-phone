@@ -5,7 +5,7 @@ It then uses the WebRTC API's to enable WebRTC calling from a browser.
 The WebRTC browser implementations are still evolving, so for now you have to start by downloading a version of the Chromium browser, from here
 
 - Mac - http://js.att.io/Leif_OSX_Release_2_5_0_15.app.zip  
-- Win - ttp://js.att.io/Leif2_Win32_Release_RC4_2012-10-15.zip  
+- Win - http://js.att.io/Leif2_Win32_Release_RC4_2012-10-15.zip  
 
 After downloading the correct browser for your operating system please always start it with these flags set:
 
