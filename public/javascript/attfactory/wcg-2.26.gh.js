@@ -97,6 +97,9 @@
     PhonoCall.prototype.hold = function(state) { if (state) { this.call.hold() } else { this.call.resume() } };
     PhonoCall.prototype.volume = function() { };
     PhonoCall.prototype.gain = function() { };
+
+    // Additional feature above phono api
+    PhonoCall.prototype.transferto = function(receiver) { this.call.transferto(receiver)  };
     
     function Phone(ms, config)
     {

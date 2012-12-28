@@ -118,7 +118,11 @@ app.get('/loggedin', function(req, res) {
         console.log(body);
         console.log(obj);
         console.log(req.session.selfNumber);
-        res.render('main', { version : req.session.version, accessToken: req.session.alphaAccessToken, selfNumber: req.session.selfNumber });
+        var version = req.param("version");
+        if(!version) {
+          version = "a1";
+        }
+        res.render('main', { version : version, accessToken: req.session.alphaAccessToken, selfNumber: req.session.selfNumber });
       } else {
         console.error('main me.json error');
         res.render('login');

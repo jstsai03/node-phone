@@ -1,3 +1,5 @@
+script(src = '/att.js?version=#{version}')
+
 #skelPage(data-role='page', data-theme='a')
   div(data-role='header')
     h1 Node Phone
@@ -17,7 +19,7 @@
     input#hold(type='button', disabled='true', value='Place on Hold...')
     input#retrieve(type='button', disabled='true', value='Retrieve Call...')
     | Transfer Number:
-    input#remote_number(type='text')
+    input#transfer_number(type='text')
     input#transfer(type='button', disabled='true', value='Transfer...')
   div(data-role='footer')
     h5 AT&T and Ericsson
@@ -56,11 +58,38 @@ script
     sel.button("refresh");
   };
 
-  function hangupReset() {
+  function toIdleState() {
     activateButton($("#call"));
     deactivateButton($("#hangup"));
     deactivateButton($("#hold"));
-    $("#status").html("Make a Call");
+    $("#status").html("Make a Call...");
+  }
+
+  function toRingingState() {
+    $("#status").html("Ringing...");
+  }
+
+  function toAnswerState() {
+    deactivateButton($("#call"));
+    activateButton($("#answer"));
+    activateButton($("#reject"));
+    $("#status").html("Answer Call...");
+  }
+
+  function toSpeechState() {
+    activateButton($("#hangup"));
+    activateButton($("#hold"));
+    deactivateButton($("#reject"));
+    deactivateButton($("#answer"));
+    $("#status").html("Active Call");
+    $("#status").html("Active Call");
+  }
+
+  function toHoldState() {
+    deactivateButton($("#hangup"));
+    deactivateButton($("#hold"));
+    activateButton($("#retrieve"));
+    $("#status").html("Call on Hold...");
   }
 
   $( '#skelPage' ).live( 'pageinit',function(event){
@@ -74,8 +103,7 @@ script
           selfNumber = "sip:" + this.sessionId;
         } 
         $("#selfnumber").html(selfNumber);
-        activateButton($("#call"), "Call");
-        $("#status").html("Make a Call");
+        toIdleState();
       },
       onUnready: function() {
         console.log("att disconnected...");
@@ -87,9 +115,7 @@ script
           call = event.call;
           console.log("Incoming call with ID " + call.id);
           // Answer the call
-          deactivateButton($("#call"));
-          activateButton($("#answer"));
-          activateButton($("#reject"));
+          toAnswerState();
           console.log("Incoming Call: " + event.call.id);
         },
         onError: function(event) {
@@ -104,16 +130,15 @@ script
     var number = $("#remote_number").val();
     call = att.phone.dial(number, {
       onRing: function() {
-        $("#status").html("Ringing");
+        toRingingState();
       },
       onAnswer: function() {
-        $("#status").html("Active Call");
-        activateButton($("#hold"));
+        toSpeechState();
       },
       onHangup: function() {
         console.log("Hangup Call...");
         call.hangup();
-        hangupReset();
+        toIdleState();
       },
       onError: function() {
         console.log("Call Error");
@@ -126,42 +151,39 @@ script
   $("#answer").click(function(event) {
     console.log("Answer Call...");
     call.answer();
-    activateButton($("#hangup"));
-    activateButton($("#hold"));
-    deactivateButton($("#reject"));
-    deactivateButton($("#answer"));
-    $("#status").html("Active Call");
+    toSpeechState();
   });
 
   $("#reject").click(function(event) {
     console.log("Reject Call...");
     call.hangup();
-    hangupReset();
+    toIdleState();
   });
 
   $("#hangup").click(function(event) {
     console.log("Hangup Call...");
     call.hangup();
-    hangupReset();
+    toIdleState();
   });
 
   $("#hold").click(function(event) {
     console.log("Hold Call...");
     call.hold(true);
-    deactivateButton($("#hangup"));
-    deactivateButton($("#hold"));
-    activateButton($("#retrieve"));
-    $("#status").html("Call on Hold...");
+    toHoldState();
   });
 
   $("#retrieve").click(function(event) {
     console.log("Retrieve Call...");
     call.hold(false);
-    activateButton($("#hangup"));
-    activateButton($("#hold"));
-    deactivateButton($("#retrieve"));
-    $("#status").html("Active Call...");
+    toSpeechState();
   });
+
+  $("#transfer").click(function(event) {
+    var number = $("#transfer_number").val();
+    call.hold(true);
+    call.transferto(number);
+    toIdleState();
+  }
 
   $("#logout-btn").bind('click', function(e) {
     att.disconnect();
