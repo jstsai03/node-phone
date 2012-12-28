@@ -1,4 +1,4 @@
-script(src = '/att.js?version=#{version}')
+script(src = '/javascript/att.#{version}.js')
 
 #skelPage(data-role='page', data-theme='a')
   div(data-role='header')
@@ -9,10 +9,10 @@ script(src = '/att.js?version=#{version}')
     p
       | Your phone number is
       span#selfnumber
-    h2#status
+    h2#status Loading...
     | Enter Phone Number:
-    input#remote_number(type='text', value='800-444-4444')
-    input#call(type='button', disabled='true', value='Loading...')
+    input#remote_number(type='text', value='214-717-8973')
+    input#call(type='button', disabled='true', value='Call...')
     input#answer(type='button', disabled='true', value='Answer...')
     input#reject(type='button', disabled='true', value='Reject...')
     input#hangup(type='button', disabled='true', value='End Call...')
@@ -62,6 +62,7 @@ script
     activateButton($("#call"));
     deactivateButton($("#hangup"));
     deactivateButton($("#hold"));
+    deactivateButton($("#transfer"));
     $("#status").html("Make a Call...");
   }
 
@@ -79,9 +80,9 @@ script
   function toSpeechState() {
     activateButton($("#hangup"));
     activateButton($("#hold"));
+    activateButton($("#transfer"));
     deactivateButton($("#reject"));
     deactivateButton($("#answer"));
-    $("#status").html("Active Call");
     $("#status").html("Active Call");
   }
 
@@ -183,7 +184,7 @@ script
     call.hold(true);
     call.transferto(number);
     toIdleState();
-  }
+  });
 
   $("#logout-btn").bind('click', function(e) {
     att.disconnect();

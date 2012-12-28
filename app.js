@@ -98,6 +98,14 @@ app.configure('production', function(){
 
 // Routes
 
+// Generate different versions of the att.js JSL
+// Currently not used - used pre-built statics instead
+app.get('/att.js', function(req, res) {
+  var version = req.param("version") || "a1";
+  console.log("fetch att.js version: " + version);
+  // TO DO:....
+});
+
 app.get('/', function(req, res) {
   console.log("root page");
   var version = req.param("version");

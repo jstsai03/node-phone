@@ -163,6 +163,22 @@
 		}, 500); };
 		
 	}
+
+  // Connect
+  H2SPhono.prototype.connect = function (config) {
+    return new H2SPhono(cfg);
+  } 
+  
+  // Disconnect
+  H2SPhono.prototype.disconnect = function () {
+    this._ms.unregister();
+    this.phono = null;
+  } 
+  
+  // Connected?
+  H2SPhono.prototype.connected = function () {
+    return this.phono;
+  } 
 	
 	H2SPhono.prototype.onerror = function(evt)
 	{
