@@ -182,6 +182,23 @@
         
         // */
     }
+
+    // Connect
+    WCGPhono.prototype.connect = function (config) {
+      return new WCGPhono(cfg);
+    } 
+    
+    // Disconnect
+    WCGPhono.prototype.disconnect = function () {
+      this._ms.unregister();
+      this.phono = null;
+    } 
+    
+    // Connected?
+    WCGPhono.prototype.connected = function () {
+      return this.phono;
+    } 
+    
     
     WCGPhono.prototype.onerror = function(evt)
     {

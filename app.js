@@ -107,31 +107,8 @@ app.get('/', function(req, res) {
   res.render('login');
 });
 
-app.get('putbacktologgedin', function(req, res) {
-  console.log("loggedin page");
-  if(req.user){
-    var url = 'https://auth.tfoundry.com/me.json?access_token=' + req.session.alphaAccessToken;
-    request(url, function (error, response, body) {
-      if (!error && response.statusCode == 200) {
-        var obj = JSON.parse(body);
-        req.session.selfNumber = obj.virtual_identifiers.mobile[0];
-        console.log(body);
-        console.log(obj);
-        console.log(req.session.selfNumber);
-        res.render('skeleton', { version : req.session.version, accessToken: req.session.alphaAccessToken, selfNumber: req.session.selfNumber });
-      } else {
-        console.error('me.json error');
-        res.render('login');
-      }
-    })
-  } else {
-    res.render('login');
-  }
-});
-
-
 app.get('/loggedin', function(req, res) {
-  console.log("skeleton page");
+  console.log("main page");
   if(req.user){
     var url = 'https://auth.tfoundry.com/me.json?access_token=' + req.session.alphaAccessToken;
     request(url, function (error, response, body) {
@@ -141,9 +118,9 @@ app.get('/loggedin', function(req, res) {
         console.log(body);
         console.log(obj);
         console.log(req.session.selfNumber);
-        res.render('skeleton', { version : req.session.version, accessToken: req.session.alphaAccessToken, selfNumber: req.session.selfNumber });
+        res.render('main', { version : req.session.version, accessToken: req.session.alphaAccessToken, selfNumber: req.session.selfNumber });
       } else {
-        console.error('skeleton me.json error');
+        console.error('main me.json error');
         res.render('login');
       }
     })
@@ -172,20 +149,6 @@ app.get('/users/auth/att/callback',
       versionTxt = '';
     }
     res.redirect('/loggedin' + versionTxt );
-  });
-
-// GET /users/auth/att/callbackskeleton
-// Callback for skeleton testing
-app.get('/users/auth/att/callbackskeleton', 
-  passport.authenticate('att-alpha'), 
-  function(req, res){
-    var versionTxt = req.session.version;
-    if(versionTxt) {
-      versionTxt = '?version=' + versionTxt;
-    } else {
-      versionTxt = '';
-    }
-    res.redirect('/skeleton' + versionTxt );
   });
 
 app.get('/logout', function(req, res){

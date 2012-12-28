@@ -182,6 +182,23 @@
         
         // */
     }
+
+    // Connect
+    WCGPhono.prototype.connect = function (config) {
+      return new WCGPhono(cfg);
+    } 
+    
+    // Disconnect
+    WCGPhono.prototype.disconnect = function () {
+      this._ms.unregister();
+      this.phono = null;
+    } 
+    
+    // Connected?
+    WCGPhono.prototype.connected = function () {
+      return this.phono;
+    } 
+    
     
     WCGPhono.prototype.onerror = function(evt)
     {
@@ -21573,7 +21590,6 @@ contact.onupdating = function(evt) {
     
     att.phoneNumber = phoneNumber;
 
-    // The Muc object assumes you'll send it a strophe connection
     function Att(options) {
       
         if(options) {
@@ -21629,6 +21645,22 @@ contact.onupdating = function(evt) {
 
         this.phone = new Phone(this);
     }
+    
+    // Connect
+    Att.prototype.connect = function (config) {
+      return new Att(cfg);
+    } 
+    
+    // Disconnect
+    Att.prototype.disconnect = function () {
+      this.phono.disconnect();
+      this.phono = null;
+    } 
+    
+    // Connected?
+    Att.prototype.connected = function () {
+      return this.phono;
+    } 
     
     function Phone(att)
     {

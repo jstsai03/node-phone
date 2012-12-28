@@ -122,7 +122,6 @@
     
     att.phoneNumber = phoneNumber;
 
-    // The Muc object assumes you'll send it a strophe connection
     function Att(options) {
       
         if(options) {
@@ -178,6 +177,22 @@
 
         this.phone = new Phone(this);
     }
+    
+    // Connect
+    Att.prototype.connect = function (config) {
+      return new Att(cfg);
+    } 
+    
+    // Disconnect
+    Att.prototype.disconnect = function () {
+      this.phono.disconnect();
+      this.phono = null;
+    } 
+    
+    // Connected?
+    Att.prototype.connected = function () {
+      return this.phono;
+    } 
     
     function Phone(att)
     {

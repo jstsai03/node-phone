@@ -1,177 +1,146 @@
-script
-  var accessToken = "#{accessToken}";
-  var selfNumber = "#{selfNumber}";
-//
-   /page one 
-//
-   Start of first page: #one 
-#logging-in(data-role='page', data-theme='a')
-  div(data-role='header')
-    h1 Node Phone
-  //
-     /header 
-  #one(data-role='content')
-    h2 Welcome to Node Phone!
-    p Logging in. Please wait!
-  //
-     /content 
-  div(data-role='footer')
-    h5 AT&T and Ericsson
-  //
-     /footer 
-//
-   /page one 
-//
-   Start of first page: #one 
-#make-call(data-role='page', data-theme='a')
+#skelPage(data-role='page', data-theme='a')
   div(data-role='header')
     h1 Node Phone
     a#logout-btn.ui-btn-right(href='#', data-role='button', data-icon='delete') Logout
-  //
-     /header 
-  #one(data-role='content')
-    h2
-      | Welcome to webphone
-      span#gui_user
-      | !
+  div(data-role='content')
+    h2 Welcome to Node Phone!
     p
       | Your phone number is
       span#selfnumber
-    p Type in a number below to call
-    p
-      | Phone Number:
-      input#remote_number(type='text')
-    button(onclick='do_call();') Make call!
-  //
-     /content 
+    h2#status
+    | Enter Phone Number:
+    input#remote_number(type='text', value='800-444-4444')
+    input#call.button(type='button', disabled='true', value='Loading...')
+    input#answer.button(type='button', disabled='true', value='Answer...')
+    input#reject.button(type='button', disabled='true', value='Reject...')
+    input#hangup.button(type='button', disabled='true', value='End Call...')
+    input#hold.button(type='button', disabled='true', value='Place on Hold...')
+    | Transfer Number:
+    input#remote_number(type='text')
+    input#hold.button(type='button', disabled='true', value='Transfer...')
   div(data-role='footer')
     h5 AT&T and Ericsson
-  //
-     /footer 
-//
-   /page one 
-//
-   Start of third page: #popup 
-#incoming-call(data-role='page', data-theme='b')
+    a(href='#info-dialog', data-icon='info', data-rel='dialog') About
+
+div#info-dialog(data-role='page')
   div(data-role='header')
-    h1 Incoming Call!
-  //
-     /header 
-  div(data-role='content', data-theme='d')
-    span(style='display: block; width: 100%; text-align: center;')
-      h2
-        span.remote-user User
-        | is calling!
-    p
-      a.incoming-call-answer(href='', data-role='button', data-inline='false', data-icon='check', data-iconpos='right', data-theme='b') Answer!
-    p
-      a.incoming-call-reject(href='', data-role='button', data-inline='false', data-icon='check', data-iconpos='right', data-theme='e') Reject!
-  //
-     /content 
-  div(data-role='footer')
-    h5 eTime 2.0
-  //
-     /footer 
-//
-   /page popup 
-#outgoing-call(data-role='page', data-theme='a')
-  div(data-role='header')
-    h1
-      | Calling
-      span.outgoing-call-user User
-  //
-     /header 
-  div(data-role='content', data-theme='a')
-    br
-    br
-    br
-    br
-    span(style='display: block; width: 100%; text-align: center;')
-      h2
-        | Waiting for
-        span.remote-user User
-        | to answer...
-    br
-    br
-    p
-      a.call-hangup(href='', data-role='button', data-inline='false', data-icon='check', data-iconpos='right', data-theme='e') Hang up
-  //
-     /content 
-  div(data-role='footer')
-    h5 eTime 2.0
-  //
-     /footer 
-//
-   /page popup 
-#outgoing-call-rejected(data-role='page', data-theme='a')
-  div(data-role='header')
-    h1
-      | Calling
-      span.outgoing-call-user User
-  //
-     /header 
-  div(data-role='content', data-theme='a')
-    br
-    br
-    br
-    br
-    span(style='display: block; width: 100%; text-align: center;')
-      h2
-        span.remote-user User
-        | rejected the call, or failed to answer, or something else happened.
-    br
-    br
-  //
-     /content 
-  div(data-role='footer')
-    h5 eTime 2.0
-  //
-     /footer 
-//
-   /page popup 
-#call(data-role='page', data-theme='a')
-  div(data-role='header')
-    h1
-      | Call with
-      span.remote-user User
-  //
-     /header 
-  div(data-role='content', data-theme='a')
-    #call-audio(style='display: inline;')
-      br
-      br
-      br
-      br
-      span(style='display: block; width: 100%; text-align: center;')
-        h2
-          span.call-time Ongoing call...
+    h1 About
+  div(data-role='content')
       p
-        a.call-hangup(href='', data-role='button', data-inline='false', data-icon='check', data-iconpos='right', data-theme='e') Hang up
-      br
-      br
-      video#remoteVideo(width='0px', height='0px', style='display: none; position: absolute; top: 0px; left: 0px;', autoplay='autoplay')
-  //
-     /content 
-  div(data-role='footer')
-    h5 eTime 2.0
-  //
-     /footer 
-//
-   /page popup 
+        | Come play with WebRTC and REAL phone numbers with AT&T and Ericsson.  For more see http://js.att.io and http://apimatrix.tfoundry.com.  For the source repo to this application please see http://github.com/att-innovate/node-phone.  Come re-think possible where communicating is something we do while doing something else...
 
 script
 
-  $(function () {
+  var accessToken = "#{accessToken}";
+  var selfNumber = "#{selfNumber}";
+  var version = "#{version}";
 
-    $("#logout-btn").bind('click', function(e) {
-      do_logout();
-    });
+  var att;
+  var call;
+  var a3Key = "75150d708376b91aa5a6119d833b8f3e";
 
-    $(document).ready( function() {
-      console.log('document ready');
-      // alert('document ready');
-      login(accessToken, selfNumber);
+  if(version && version == "a3") {
+    $("#selfnumber").html("Phono: XXXXXX");
+    accessToken = a3Key;
+  } else {
+    $("#selfnumber").html(selfNumber);
+  }
+
+  function activateButton(sel, txt) {
+    if(txt) {
+      sel.val(txt);
+    }
+    sel.button("enable");
+    sel.button("refresh");
+  };
+
+  function deactivateButton(sel) {
+    sel.button("disable");
+    sel.button("refresh");
+  };
+
+  $( '#skelPage' ).live( 'pageinit',function(event){
+    console.log("pageinit ready");
+    att = $.att({
+      version: version,
+      apiKey: accessToken,
+      onReady: function() {
+        console.log("att on ready...");
+        activateButton($("#call"), "Call");
+        $("#status").html("Make a Call");
+      },
+      onUnready: function() {
+        console.log("att disconnected...");
+      },
+      // Phone API Configuration
+      phone: {
+        // Event Handlers
+        onIncomingCall: function(event) {
+          call = event.call;
+          console.log("Incoming call with ID " + call.id);
+          // Answer the call
+          deactivateButton($("#call"));
+          activateButton($("#answer"));
+          activateButton($("#reject"));
+          console.log("Incoming Call: " + event.call.id);
+        },
+        onError: function(event) {
+          console.log("Phone error: " + e.reason);
+        }
+      }
     });
-    
   });
+
+  $("#call").click(function(event) {
+    
+    var number = $("#remote_number").val();
+    att.phone.dial(number, {
+      onRing: function() {
+        $("#status").html("Ringing");
+      },
+      onAnswer: function() {
+        $("#status").html("Answered");
+      },
+      onHangup: function() {
+        $("#call").attr("disabled", false).val("Call");
+        $("#status").html("Hangup");
+      },
+      onError: function() {
+        console.log("Call Error");
+      }
+    });
+    deactivateButton($("#call"));
+    activateButton($("#hangup"));
+  });
+
+  $("#answer").click(function(event) {
+    console.log("Answer Call...");
+    call.answer();
+    activateButton($("#hangup"));
+    deactivateButton($("#answer"));
+    $("#status").html("Active Call");
+  });
+
+  $("#reject").click(function(event) {
+    console.log("Reject Call...");
+    call.hangup();
+    activateButton($("#call"));
+    deactivateButton($("#hangup"));
+    deactivateButton($("#answer"));
+    $("#status").html("Make a Call");
+  });
+
+  $("#hangup").click(function(event) {
+    console.log("Hangup Call...");
+    call.hangup();
+    activateButton($("#call"));
+    deactivateButton($("#hangup"));
+    $("#status").html("Make a Call");
+  });
+
+  $("#logout-btn").bind('click', function(e) {
+    att.disconnect();
+    $.mobile.changePage("logout");
+  });
+
 
