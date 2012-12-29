@@ -98,6 +98,17 @@
     PhonoCall.prototype.volume = function() { };
     PhonoCall.prototype.gain = function() { };
 
+    PhonoCall.prototype.bind = function(config) {
+    
+      if (config) {
+        for(var key in config) {
+          if (typeof config[key] == 'function') {
+              this[key] = config[key];
+          }
+        }
+      }
+    };
+
     // Additional feature above phono api
     PhonoCall.prototype.transferto = function(receiver) { this.call.transferto(receiver)  };
     
@@ -2044,6 +2055,9 @@ call.end();
         var _call = this;
         var audiovideoURL = this._url;
         
+        // FIXME - Remove the below call as soon as architects allow..
+        audiovideoURL = this._apigeeFix(audiovideoURL);
+        
         logger.log("Leaving call...");
         
         // Create and send a create conference request
@@ -2385,12 +2399,29 @@ call.transferto(transferaddress);
         });
     };
     
+    // FIXME
+    // GEOFF HACK TO FIX direct wcg event coming from apigee g/w
+    // DO NOT LEAVE AS IS
+    // Replace "https://api.foundry.att.com/HaikuServlet/rest/v2/session/xxx/audiovideo/yyy with
+    // Replace "APIGEE SERVER/session/xxx/audiovideo/yyy 
+    Call.prototype._apigeeFix = function(url, uniqueSessionUrl) {
+      if(url.indexOf("HaikuServlet") != -1) {
+        logger.log("Rewriting url from: " + url);
+        url = url.replace(/^.*\/session\/.+?\//, this._mediaServices._gwUrl);
+        logger.log("to: " + url);
+      }
+      return url;
+    }
+
     /**
     WCG signalling
     @private
     */
     Call.prototype._sendSignaling = function(type, sdp) {
         var _call = this;
+
+        // FIXME - Remove the below call as soon as architects allow..
+        this._url = this._apigeeFix(this._url);
         var url = this._url;
 
     //
@@ -2398,12 +2429,14 @@ call.transferto(transferaddress);
     // DO NOT LEAVE AS IS
     // Replace "https://api.foundry.att.com/HaikuServlet/rest/v2/session/xxx/audiovideo/yyy with
     // Replace "APIGEE SERVER/session/xxx/audiovideo/yyy 
+     /*
     if(url.indexOf("HaikuServlet") != -1) {
       logger.log("Rewriting url from: " + url);
       url = url.replace(/^.*\/session\/.+?\//, _call._mediaServices._gwUrl);
       logger.log("to: " + url);
       this._url = url;
     }
+    */
 
         console.log("Sending " + type + " with SDP: " + sdp);
         if (type == "OFFER" || type == "offer") {

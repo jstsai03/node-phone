@@ -60,6 +60,8 @@ script
 
   function toIdleState() {
     activateButton($("#call"));
+    deactivateButton($("#answer"));
+    deactivateButton($("#reject"));
     deactivateButton($("#hangup"));
     deactivateButton($("#hold"));
     deactivateButton($("#transfer"));
@@ -114,10 +116,18 @@ script
         // Event Handlers
         onIncomingCall: function(event) {
           call = event.call;
-          console.log("Incoming call with ID " + call.id);
-          // Answer the call
+          console.log("Incoming Call: " + call.id);
+          call.bind({ 
+            onHangup: function(event) { 
+              console.log("Hangup Call...");
+              toIdleState();
+            }, 
+            onError: function(event) { 
+              alert("Incoming call error:" + event); 
+            }
+          });
+          // Prepare to answer the call
           toAnswerState();
-          console.log("Incoming Call: " + event.call.id);
         },
         onError: function(event) {
           console.log("Phone error: " + e.reason);
@@ -138,7 +148,6 @@ script
       },
       onHangup: function() {
         console.log("Hangup Call...");
-        call.hangup();
         toIdleState();
       },
       onError: function() {
@@ -156,7 +165,7 @@ script
   });
 
   $("#reject").click(function(event) {
-    console.log("Reject Call...");
+    console.log("Reject Call: " + call.id);
     call.hangup();
     toIdleState();
   });

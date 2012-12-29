@@ -133,6 +133,135 @@
     
     att.phoneNumber = phoneNumber;
 
+    /*
+    WildEmitter.js is a slim little event emitter largely based on @visionmedia's Emitter from UI Kit.
+    
+    I wanted it standalone.
+    
+    I also wanted support for wildcard emitters. Like:
+    
+    emitter.on('*', function (eventName, other, event, payloads) {
+        
+    });
+    
+    emitter.on('somenamespace*', function (eventName, payloads) {
+        
+    });
+    
+    Functions triggered by wildcard registered events also get the event name as the first argument.
+    
+    */
+    function WildEmitter() {
+        this.callbacks = {};
+    }
+    
+    // Listen on the given `event` with `fn`. Store a group name if present.
+    WildEmitter.prototype.on = function (event, groupName, fn) {
+        var hasGroup = (arguments.length === 3),
+            group = hasGroup ? arguments[1] : undefined, 
+            func = hasGroup ? arguments[2] : arguments[1];
+        func._groupName = group;
+        (this.callbacks[event] = this.callbacks[event] || []).push(func);
+        return this;
+    };
+    
+    // Adds an `event` listener that will be invoked a single
+    // time then automatically removed.
+    WildEmitter.prototype.once = function (event, fn) {
+        var self = this;
+        function on() {
+            self.off(event, on);
+            fn.apply(this, arguments);
+        }
+        this.on(event, on);
+        return this;
+    };
+    
+    // Unbinds an entire group
+    WildEmitter.prototype.releaseGroup = function (groupName) {
+        var item, i, len, handlers;
+        for (item in this.callbacks) {
+            handlers = this.callbacks[item];
+            for (i = 0, len = handlers.length; i < len; i++) {
+                if (handlers[i]._groupName === groupName) {
+                    //console.log('removing');
+                    // remove it and shorten the array we're looping through
+                    handlers.splice(i, 1);
+                    i--;
+                    len--;
+                }
+            }
+        }
+        return this;
+    };
+    
+    // Remove the given callback for `event` or all
+    // registered callbacks.
+    WildEmitter.prototype.off = function (event, fn) {
+        var callbacks = this.callbacks[event],
+            i;
+        
+        if (!callbacks) return this;
+    
+        // remove all handlers
+        if (arguments.length === 1) {
+            delete this.callbacks[event];
+            return this;
+        }
+    
+        // remove specific handler
+        i = callbacks.indexOf(fn);
+        callbacks.splice(i, 1);
+        return this;
+    };
+    
+    // Emit `event` with the given args.
+    // also calls any `*` handlers
+    WildEmitter.prototype.emit = function (event) {
+        var args = [].slice.call(arguments, 1),
+            callbacks = this.callbacks[event],
+            specialCallbacks = this.getWildcardCallbacks(event),
+            i,
+            len,
+            item;
+    
+        // Geoff A hack of all hacks even if i say so myself
+        // Place a handler in the way so any bindings from call.bind keep Att object in middle
+        //Otherwise we lose event state model 
+        if(event == 'onIncomingCall') {
+          var attCall = new AttCall(this, args[0]['call']);
+          args[0] = {'call' : attCall};
+        }
+
+        if (callbacks) {
+            for (i = 0, len = callbacks.length; i < len; ++i) {
+                callbacks[i].apply(this, args);
+            }
+        }
+    
+        if (specialCallbacks) {
+            for (i = 0, len = specialCallbacks.length; i < len; ++i) {
+                specialCallbacks[i].apply(this, [event].concat(args));
+            }
+        }
+    
+        return this;
+    };
+    
+    // Helper for for finding special wildcard event handlers that match the event
+    WildEmitter.prototype.getWildcardCallbacks = function (eventName) {
+        var item,
+            split,
+            result = [];
+    
+        for (item in this.callbacks) {
+            split = item.split('*');
+            if (item === '*' || (split.length === 2 && eventName.slice(0, split[1].length) === split[1])) {
+                result = result.concat(this.callbacks[item]);
+            }
+        }
+        return result;
+    };
     function Att(options) {
       
         if(options) {
@@ -158,12 +287,52 @@
                 'onIncomingCall': 'incomingCall',
                 'onError': 'error',
                 'onCallBegin': 'callBegin',
-                'onCallEnd': 'callEnd'
+                'onCallEnd': 'callEnd',
+                'onOutgoingCall': 'outgoingCall',
+                'onCalling': 'calling'
+            },
+            phonoAPICallbacks = {
+                'onIncomingCall': 'incomingCall',
+                'onError': 'error'
             };
     
         // extend our defaults
         _.extend(this.config, opts);
     
+        // support att.phone.dial() api
+        this.phone = this;
+    
+        // inherit wildemitter properties
+        WildEmitter.call(this);
+    
+        // register handlers passed in on init
+        _.each(availableCallbacks, function (key, value) {
+            if (_.isFunc(self.config[key])) {
+              self.on(key, self.config[key]);
+              self.config[key] = function(event) {
+                self.emit(key, event);
+              }
+            }
+        });
+    
+        // support phono api
+        if (opts.phone) {
+            _.each(phonoAPICallbacks, function (key, value) {
+                if (_.isFunc(self.config.phone[key])) {
+                  self.on(key, self.config.phone[key]);
+                  self.config.phone[key] = function(event) {
+                    self.emit(key, event);
+                  }
+                }
+            });
+        }
+    
+        if (this.config.log) {
+            this.on('*', function (eventName, payload) {
+                console.log('att.js event:', eventName, payload);
+            });
+        }
+
         // always override with query param version, if set
         this.config.version = _.getQueryParam('version') || this.config.version;
     
@@ -186,8 +355,10 @@
             this.phono = $.phono(config);
         }
 
-        this.phone = new Phone(this);
     }
+    
+    // set our prototype to be a new emitter instance
+    Att.prototype = new WildEmitter();
     
     // Connect
     Att.prototype.connect = function (config) {
@@ -205,18 +376,101 @@
       return this.phono;
     } 
     
-    function Phone(att)
-    {
+    // outgoing call
+    Att.prototype.dial = function (phoneNumber, callbackHash) {
+        var self = this,
+            callable = att.phoneNumber.getCallable(phoneNumber),
+            callbacks = callbackHash || {};
+        this.emit('calling', phoneNumber);
+        var call = this.phono.phone.dial(callable, {
+            // Events
+            onRing: function () {
+                self.emit('outgoingCall', call);
+                if (callbacks.onRing) callbacks.onRing(call);
+            },
+            onAnswer: function () {
+                self.emit('callBegin', call);
+                if (callbacks.onAnswer) callbacks.onAnswer(call);
+            },
+            onHangup: function () {
+                self.emit('callEnd', call);
+                if (callbacks.onHangup) callbacks.onHangup(call);
+            },
+            onError: function () {
+                self.emit('error', call);
+                if (callbacks.onError) callbacks.onError(call);
+            },
+        });
+        return call;
+    };
+
+    function AttCall(att, call) {
       this._att = att;
+      this._call = call;
+      this.id = call.id;
+      return this;
+    }
+
+    AttCall.prototype.bind = function(config) {
+      // support phono call api
+      var phonoCallAPICallbacks = {
+          'onRing': 'ring',
+          'onAnswer': 'answer',
+          'onHangup': 'hangup',
+          'onError': 'error'
+      };
+
+      var self = this._att;
+
+      if (config) {
+        _.each(phonoCallAPICallbacks, function (key, value) {
+            if (_.isFunc(config[key])) {
+              self.on(key, config[key]);
+              config[key] = function(event) {
+                self.emit(key, event);
+              }
+            }
+        });
+      }
+      return this._call.bind(config);
     }
     
-    // outgoing call
-    Phone.prototype.dial = function (phoneNumber, config) {
-      var callable = att.phoneNumber.getCallable(phoneNumber);
-      call = this._att.phono.phone.dial(callable, config);
-      return call;
-    } 
-    
+    AttCall.prototype.answer = function() {
+      return this._call.answer();
+    }
+      
+    AttCall.prototype.hangup = function() {
+      return this._call.hangup();
+    }
+      
+    AttCall.prototype.digit = function(digit) {
+      return this._call.digit(digit);
+    }
+      
+    AttCall.prototype.pushToTalk = function(flag) {
+      return this._call.pushToTalk(flag);
+    }
+      
+    AttCall.prototype.talking = function(flag) {
+      return this._call.talking(flag);
+    }
+      
+    AttCall.prototype.mute = function(flag) {
+      return this._call.mute(flag);
+    }
+      
+    AttCall.prototype.hold = function(flag) {
+      return this._call.hold(flag);
+    }
+      
+    AttCall.prototype.volume = function(level) {
+      return this._call.volume(level);
+    }
+      
+    AttCall.prototype.gain = function(level) {
+      return this._call.gain(level);
+    }
+      
     $.extend({att: function(cfg) { return new Att(cfg); }});
 
 })(jQuery);
