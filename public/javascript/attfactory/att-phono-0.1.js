@@ -1,5 +1,5 @@
 /*global io MediaServices Phono*/
-(function ($) {
+(function () {
     // Utils and references
     var root = this,
         att = {};
@@ -355,6 +355,7 @@
             this.phono = $.phono(config);
         }
 
+        this.sessionId = this.phono.sessionId;
     }
     
     // set our prototype to be a new emitter instance
@@ -471,6 +472,21 @@
       return this._call.gain(level);
     }
       
-    $.extend({att: function(cfg) { return new Att(cfg); }});
+    // attch it to root
+    att.Phone = Att;
+    if (root.jQuery) {
+        root.jQuery.att = function (opts) {
+            return new Att(opts);
+        };
+    }
+    
+    // attach to window or export with commonJS
+    if (typeof exports !== 'undefined') {
+        module.exports = att;
+    } else {
+        // make sure we've got an "att" global
+        root.att || (root.att = {});
+        _.extend(root.att, att);
+    }
 
-})(jQuery);
+}).call(this);
