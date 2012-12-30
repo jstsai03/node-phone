@@ -116,8 +116,8 @@ script
           selfNumber = "sip:" + this.phono.sessionId;
         } 
         $("#selfnumber").html(selfNumber);
-        var cb = new CandyBar({'phone' : att});
-        cb.render();
+        // var cb = new CandyBar({'phone' : att});
+        // cb.render();
         toIdleState();
       },
       onUnready: function() {
@@ -151,6 +151,7 @@ script
   $("#call").click(function(event) {
     
     var number = $("#remote_number").val();
+    toCallingState();
     call = att.phone.dial(number, {
       onRing: function() {
         toRingingState();
@@ -166,7 +167,6 @@ script
         console.log("Call Error");
       }
     });
-    toCallingState();
   });
 
   $("#answer").click(function(event) {

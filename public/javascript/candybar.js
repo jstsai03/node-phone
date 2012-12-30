@@ -32,6 +32,7 @@
   var phoney = window.att && window.att.phoneNumber || window.phoney;
 
   var CandyBar = function (options) {
+
     var spec = options || {};
     this.states = {
       incoming: {
@@ -83,6 +84,10 @@
     }
   };
   
+  CandyBar.prototype.cancel = function() {
+    alert("Cancel pressed");
+  };
+
   CandyBar.prototype.render = function () {
     if (!this.dom) {
       this.dom = this.domify(template(this));
@@ -222,7 +227,9 @@
     this.user = details;
     if (!this.dom) return;
     var user = this.getUser();
-    this.dom.querySelector('.callerAvatar').src = user.picUrl;
+    if(user.picUrl) {
+      this.dom.querySelector('.callerAvatar').src = user.picUrl;
+    }
     this.dom.querySelector('.callerNumber').innerHTML = phoney.stringify(user.number);
     this.dom.querySelector('.callerName').innerHTML = user.name;
     if (user.picUrl) {
