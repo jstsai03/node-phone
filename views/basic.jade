@@ -109,7 +109,7 @@ script
         if(version && version == "a3") {
           // Don't know why but this phono.sessionId is null in att.js then gets magically completed by here
           // Race Situation?
-          selfNumber = "sip:" + this.phono.sessionId;
+          //selfNumber = "sip:" + this.sessionId;
         } 
         selfNumber = formatPhone(selfNumber);
         $("#selfnumber").html(selfNumber);
