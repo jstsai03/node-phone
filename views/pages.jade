@@ -1,0 +1,234 @@
+script(src = '/javascript/att.#{version}.js')
+
+//
+   /page logging in 
+//
+   Start of first page: #one 
+#logging-in(data-role='page', data-theme='a')
+  include header.jade
+  #one(data-role='content')
+    h2 Welcome to webphone!
+    p Logging in. Please wait!
+  include footer.jade
+//
+   /page one 
+//
+   Start of first page: #one 
+#make-call(data-role='page', data-theme='a')
+  include header.jade
+  #one(data-role='content')
+    h2
+      | Welcome to webphone
+      span#gui_user
+      | !
+    p
+      | Your phone number is
+      span#selfnumber
+    p Type in a number below to call
+    p
+      | Phone Number:
+      input#remote_number(type='text')
+    a.make-call(href='', data-role='button') Make call!
+    // button(onclick='do_call();') Make call!
+  include footer.jade
+//
+   /page one 
+//
+   Start of third page: #popup 
+#incoming-call(data-role='page', data-theme='b')
+  include header.jade
+  div(data-role='content', data-theme='d')
+    span(style='display: block; width: 100%; text-align: center;')
+      h2
+        span.remote-user User
+        | is calling!
+    p
+      a.incoming-call-answer(href='', data-role='button', data-inline='false', data-icon='check', data-iconpos='right', data-theme='b') Answer!
+    p
+      a.incoming-call-reject(href='', data-role='button', data-inline='false', data-icon='check', data-iconpos='right', data-theme='e') Reject!
+  include footer.jade
+
+//
+   /page popup 
+#outgoing-call(data-role='page', data-theme='a')
+  include header.jade
+  div(data-role='content', data-theme='a')
+    h1
+      | Calling
+      span.outgoing-call-user User
+    br
+    br
+    br
+    br
+    span(style='display: block; width: 100%; text-align: center;')
+      h2
+        | Waiting for
+        span.remote-user User
+        | to answer...
+    br
+    br
+    p
+      a.call-hangup(href='', data-role='button', data-inline='false', data-icon='check', data-iconpos='right', data-theme='e') Hang up
+  include footer.jade
+
+//
+   /page popup 
+#outgoing-call-rejected(data-role='page', data-theme='a')
+  include header.jade
+  div(data-role='content', data-theme='a')
+    h1
+      | Calling
+      span.outgoing-call-user User
+    br
+    br
+    br
+    br
+    span(style='display: block; width: 100%; text-align: center;')
+      h2
+        span.remote-user User
+        | rejected the call, or failed to answer, or something else happened.
+    br
+    br
+  include footer.jade
+
+//
+   /page popup 
+#call(data-role='page', data-theme='a')
+  include header.jade
+  div(data-role='content', data-theme='a')
+    h1
+      | Call with
+      span.remote-user User
+    #call-audio(style='display: inline;')
+      br
+      br
+      br
+      br
+      span(style='display: block; width: 100%; text-align: center;')
+        h2
+          span.call-time Ongoing call...
+      p
+        a.call-hangup(href='', data-role='button', data-inline='false', data-icon='check', data-iconpos='right', data-theme='e') Hang up
+      br
+      br
+      video#remoteVideo(width='0px', height='0px', style='display: none; position: absolute; top: 0px; left: 0px;', autoplay='autoplay')
+  include footer.jade
+
+//
+   /page popup 
+
+script
+
+  var accessToken = "#{accessToken}";
+  var selfNumber = "#{selfNumber}";
+  var version = "#{version}";
+
+  $('.pages').addClass('ui-btn-active ui-state-persist');
+
+  var att;
+  var call;
+  var a3Key = "75150d708376b91aa5a6119d833b8f3e";
+  if(version && version == "a3") {
+    accessToken = a3Key;
+  } 
+
+  $("#logout-btn").bind('click', function(e) {
+    att.disconnect();
+    $.mobile.changePage("logout");
+  });
+
+  $( '#logging-in' ).live( 'pageinit',function(event){
+    console.log("pageinit ready");
+    att = $.att({
+      version: version,
+      apiKey: accessToken,
+      onReady: function() {
+        console.log("att on ready...");
+        if(version && version == "a3") {
+          // Don't know why but this phono.sessionId is null in att.js then gets magically completed by here
+          // Race Situation?
+          selfNumber = "sip:" + this.phono.sessionId;
+        } 
+        selfNumber = formatPhone(selfNumber);
+        $("#selfnumber").html(selfNumber);
+        $.mobile.changePage($("#make-call"));
+      },
+      onUnready: function() {
+        console.log("att disconnected...");
+      },
+      // Phone API Configuration
+      phone: {
+        // Event Handlers
+        onIncomingCall: function(event) {
+          call = event.call;
+          console.log("Incoming Call: " + call.id);
+          call.bind({ 
+            onHangup: function(event) { 
+              console.log("Hangup Call...");
+              $.mobile.changePage($("#make-call"));
+            }, 
+            onError: function(event) { 
+              alert("Incoming call error:" + event); 
+            }
+          });
+          // Prepare to answer the call
+          var rNum = evt.call.initiator;
+          var match = rNum.match(/[0-9]+/);
+          if (match.length > 0)
+            rNum = match[0];
+          rNum = formatPhone(rNum);
+          $(".remote-user").text(rNum);
+          $.mobile.changePage($("#incoming-call"));
+        },
+        onError: function(event) {
+          console.log("Phone error: " + e.reason);
+        }
+      }
+    });
+  });
+
+  $(".incoming-call-answer").live("click", function() {
+    self.call.answer();
+    console.log("Answer Call...");
+    $.mobile.changePage($("#call"));
+  });
+
+  $(".incoming-call-reject").live("click", function() {
+    self.call.hangup();
+    console.log("Reject Call...");
+    $.mobile.changePage($("#make-call"));
+  });
+
+  $(".call-hangup").live("click", function() {
+    self.call.hangup();
+    console.log("Hangup Call...");
+    $.mobile.changePage($("#make-call"));
+  });
+
+  $(".make-call").live("click", function() {
+
+    num = remote_number.value;
+    call = att.phone.dial(num, {
+      onRing: function() {
+        console.log("Ringing State");
+      },
+      onAnswer: function() {
+        console.log("Call Answered");
+        $.mobile.changePage($("#call"));
+      },
+      onHangup: function() {
+        console.log("Hangup Call...");
+        setTimeout(function() { if ($.mobile.activePage.attr("id") == "outgoing-call-rejected") $.mobile.changePage($("#make-call"), {reverse: true});}, 2000);
+        $.mobile.changePage($("#outgoing-call-rejected"), {transition: "fade"});
+      },
+      onError: function() {
+        console.log("Call Error");
+        setTimeout(function() { if ($.mobile.activePage.attr("id") == "outgoing-call-rejected") $.mobile.changePage($("#make-call"), {reverse: true});}, 2000);
+        $.mobile.changePage($("#outgoing-call-rejected"), {transition: "fade"});
+      }
+    });
+    
+    $(".remote-user").text(formatPhone(num));
+    
+    $.mobile.changePage($("#outgoing-call"));
+  })

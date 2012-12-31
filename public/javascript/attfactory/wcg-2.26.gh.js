@@ -78,8 +78,10 @@
         this.__defineGetter__("localStreams", function() { return call.localStreams; });
         this.__defineGetter__("remoteStreams", function() { return call.localStreams; });
         
-        if (!destination)
+        if (!destination) {
             this.__defineGetter__("from", function() { return call.recipient; });
+            this.__defineGetter__("initiator", function() { return call.recipient; });
+        }
         
         this.id = uuid();
         this.call = call;

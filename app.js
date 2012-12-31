@@ -98,14 +98,6 @@ app.configure('production', function(){
 
 // Routes
 
-// Generate different versions of the att.js JSL
-// Currently not used - used pre-built statics instead
-app.get('/att.js', function(req, res) {
-  var version = req.param("version") || "a1";
-  console.log("fetch att.js version: " + version);
-  // TO DO:....
-});
-
 app.get('/', function(req, res) {
   console.log("root page");
   var version = req.param("version");
@@ -115,9 +107,23 @@ app.get('/', function(req, res) {
   res.render('login');
 });
 
-app.get('/loggedin', function(req, res) {
-  console.log("main page");
-  if(req.user){
+function generateUI(req, res, ui) {
+
+  var version = req.param("version");
+  if(version) {
+    req.session.currentVersion = version;
+  } else {
+    version = "a1";
+  }
+
+  if(!req.session.currentVersion) {
+    req.session.currentVersion = version;
+  }
+
+  req.session.currentVersion = version;
+
+  console.log("version=" + version);
+  if(!req.session.selfNumber) {
     var url = 'https://auth.tfoundry.com/me.json?access_token=' + req.session.alphaAccessToken;
     request(url, function (error, response, body) {
       if (!error && response.statusCode == 200) {
@@ -126,16 +132,41 @@ app.get('/loggedin', function(req, res) {
         console.log(body);
         console.log(obj);
         console.log(req.session.selfNumber);
-        var version = req.param("version");
-        if(!version) {
-          version = "a1";
-        }
-        res.render('main', { version : version, accessToken: req.session.alphaAccessToken, selfNumber: req.session.selfNumber });
+        res.render(ui, { version : version, accessToken: req.session.alphaAccessToken, selfNumber: req.session.selfNumber });
       } else {
-        console.error('main me.json error');
+        console.error(ui + ' me.json error');
         res.render('login');
+        return;
       }
-    })
+    });
+  } else {
+    console.log("session version=" + req.session.currentVersion);
+    res.render(ui, { version : req.session.currentVersion, accessToken: req.session.alphaAccessToken, selfNumber: req.session.selfNumber });
+  }
+}
+
+app.get('/basic', function(req, res) {
+  console.log("main basic page");
+  if(req.user){
+    generateUI(req, res, "basic");
+  } else {
+    res.render('login');
+  }
+});
+
+app.get('/pages', function(req, res) {
+  console.log("main pages page");
+  if(req.user){
+    generateUI(req, res, "pages");
+  } else {
+    res.render('login');
+  }
+});
+
+app.get('/cbar', function(req, res) {
+  console.log("main cbar page");
+  if(req.user){
+    generateUI(req, res, "cbar");
   } else {
     res.render('login');
   }
@@ -161,7 +192,7 @@ app.get('/users/auth/att/callback',
     } else {
       versionTxt = '';
     }
-    res.redirect('/loggedin' + versionTxt );
+    res.redirect('/basic' + versionTxt );
   });
 
 app.get('/logout', function(req, res){

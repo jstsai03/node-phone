@@ -7676,14 +7676,17 @@ WebRTCAudio.prototype.createContainer = function() {
                 results = regex.exec(window.location.search);
             return (results) ? decodeURIComponent(results[1].replace(/\+/g, " ")) : undefined;
         },
+
         // used to try to determine whether they're using the ericsson leif browser
         // this is not an ideal way to check, but I'm not sure how to do it since
         // leif if pretty much just stock chromium.
         h2sSupport: function () {
-          // return !!window.webkitPeerConnection00 && window.navigator.userAgent.indexOf('Chrome/24') !== -1;
           //first OR is for original leif
-          // second OR is for IIP Leif
+          // second OR is for Mobile bowser
+          // third OR is for IIP Leif
           return ( (window.navigator.userAgent == "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/536.4 (KHTML, like Gecko) Chrome/19.0.1077.0 Safari/536.4")
+            ||
+            (window.navigator.userAgent == "Mozilla/5.0 (iPhone; CPU iPhone OS 6_0_1 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Mobile/10A523")
             ||
             (window.webkitPeerConnection00 && window.navigator.userAgent.indexOf('Chrome/24') !== -1));
         }
@@ -8105,6 +8108,8 @@ WebRTCAudio.prototype.createContainer = function() {
     AttCall.prototype.gain = function(level) {
       return this._call.gain(level);
     }
+
+    AttCall.prototype.__defineGetter__("initiator", function() { return this._call.initiator; });
       
     // attch it to root
     att.Phone = Att;
