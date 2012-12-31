@@ -7,7 +7,7 @@ script(src = '/javascript/att.#{version}.js')
 #logging-in(data-role='page', data-theme='a')
   include header.jade
   #one(data-role='content')
-    h2 Welcome to webphone!
+    h2 Welcome to Node Phone!
     p Logging in. Please wait!
   include footer.jade
 //
@@ -18,7 +18,7 @@ script(src = '/javascript/att.#{version}.js')
   include header.jade
   #one(data-role='content')
     h2
-      | Welcome to webphone
+      | Welcome to Node Phone
       span#gui_user
       | !
     p
@@ -126,7 +126,6 @@ script
   $('.pages').addClass('ui-btn-active ui-state-persist');
 
   var att;
-  var call;
   var a3Key = "75150d708376b91aa5a6119d833b8f3e";
   if(version && version == "a3") {
     accessToken = a3Key;
@@ -160,7 +159,7 @@ script
       phone: {
         // Event Handlers
         onIncomingCall: function(event) {
-          call = event.call;
+          self.call = event.call;
           console.log("Incoming Call: " + call.id);
           call.bind({ 
             onHangup: function(event) { 
@@ -172,7 +171,7 @@ script
             }
           });
           // Prepare to answer the call
-          var rNum = evt.call.initiator;
+          var rNum = event.call.initiator;
           var match = rNum.match(/[0-9]+/);
           if (match.length > 0)
             rNum = match[0];
@@ -208,7 +207,7 @@ script
   $(".make-call").live("click", function() {
 
     num = remote_number.value;
-    call = att.phone.dial(num, {
+    self.call = att.phone.dial(num, {
       onRing: function() {
         console.log("Ringing State");
       },

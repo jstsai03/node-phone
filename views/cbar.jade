@@ -6,7 +6,7 @@ link(rel="stylesheet", href="/stylesheets/candybar.css")
   include header.jade
           
   div(data-role='content')
-    h2 Welcome to Node Phone!
+    h2 Still Under Construction...
     p
       | Your phone number is 
       span#selfnumber
@@ -33,7 +33,7 @@ script
   var selfNumber = "#{selfNumber}";
   var version = "#{version}";
 
-  $('.basic').addClass('ui-btn-active ui-state-persist');
+  $('.cbar').addClass('ui-btn-active ui-state-persist');
 
   var att;
   var call;
@@ -114,8 +114,8 @@ script
           selfNumber = "sip:" + this.phono.sessionId;
         } 
         $("#selfnumber").html(selfNumber);
-        // var cb = new CandyBar({'phone' : att});
-        // cb.render();
+        var cb = new CandyBar({'phone' : att});
+        cb.render();
         toIdleState();
       },
       onUnready: function() {
