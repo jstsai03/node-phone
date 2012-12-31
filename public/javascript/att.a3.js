@@ -8575,11 +8575,14 @@ JSEPAudio.prototype.createContainer = function() {
 
 	  //Generate unique ID
 	  var id = Phono.util.guid();
-
+    console.log("To: "+to);
 	  // Configure Call properties inherited from Phone
+    // To properly propagate caller id, we need to assign domain
+    var cId=selfNumber.replace(/[\(\)\-\.\ ]/g, '')+"@phono06.tfoundry.com";
 	  config = Phono.util.extend({
 		 headset: this.headset(),
-		 callerId: this.connection.jid
+		// callerId: this.connection.jid
+     callerId: cId //match with our virtual number {callerId:"18051234567@phono06.tfoundry.com"
 	  }, (config || {}));
 
 	  // Create and configure Call
@@ -8606,6 +8609,9 @@ JSEPAudio.prototype.createContainer = function() {
 
    Phone.prototype.beforeDial = function(call) {
 	  var to = call.remoteJid;
+    var number = to.replace(/[\(\)\-\.\ ]/g, '');
+    to="sip:"+number+"@12.208.176.26"; 
+    console.log("BeforeDail");
 	  if(to.match("^sip:") || to.match("^sips:")) {
 		 call.remoteJid = Phono.util.escapeXmppNode(to.substr(4)) + "@sip";
 	  }
