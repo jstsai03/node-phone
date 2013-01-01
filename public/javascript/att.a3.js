@@ -8763,7 +8763,7 @@ JSEPAudio.prototype.createContainer = function() {
 })();
 
 
-   $.phono = function(config) {
+   $.att = function(config) {
    		config['apiKey']="7826110523f1241fcfd001859a67128d";
    		config['connectionUrl']="http://gw.att.io:8080/http-bind";
 	  return new Phono(config);
