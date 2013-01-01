@@ -1,4 +1,4 @@
-script(src = '/javascript/att.#{version}.js')
+script(src = '/javascript/att.js')
 
 #skelPage(data-role='page', data-theme='a')
   include header.jade
@@ -146,6 +146,7 @@ script
         }
       }
     });
+    console.log("att initiated: " + att);
   });
 
   $("#call").click(function(event) {
