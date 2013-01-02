@@ -32,7 +32,7 @@ script
   var selfNumber = "#{selfNumber}";
   var version = "#{version}";
 
-  $('.cbar').addClass('ui-btn-active ui-state-persist');
+  $('.candybar').addClass('ui-btn-active ui-state-persist');
 
   var att;
   var call;
@@ -103,11 +103,6 @@ script
       apiKey: accessToken,
       onReady: function() {
         console.log("att on ready...");
-        if(version && version == "a3") {
-          // Don't know why but this phono.sessionId is null in att.js then gets magically completed by here
-          // Race Situation?
-          selfNumber = "sip:" + this.phono.sessionId;
-        } 
         $("#selfnumber").html(selfNumber);
         var cb = new CandyBar({'phone' : att});
         cb.render();

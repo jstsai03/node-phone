@@ -120,8 +120,6 @@ function generateUI(req, res, ui) {
     req.session.currentVersion = version;
   }
 
-  req.session.currentVersion = version;
-
   console.log("version=" + version);
   if(!req.session.selfNumber) {
     var url = 'https://auth.tfoundry.com/me.json?access_token=' + req.session.alphaAccessToken;
