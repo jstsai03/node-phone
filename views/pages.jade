@@ -124,10 +124,6 @@ script
   $('.pages').addClass('ui-btn-active ui-state-persist');
 
   var att;
-  var a3Key = "75150d708376b91aa5a6119d833b8f3e";
-  if(version && version == "a3") {
-    accessToken = a3Key;
-  } 
 
   $("#logout-btn").bind('click', function(e) {
     att.disconnect();
