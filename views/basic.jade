@@ -8,7 +8,7 @@
       span#selfnumber
     h2#status Loading...
     | Enter Phone Number:
-    input#remote_number(type='text', value='')
+    input#remote_number(type='text', value='2147178973')
     input#call(type='button', disabled='true', value='Call...')
     input#answer(type='button', disabled='true', value='Answer...')
     input#reject(type='button', disabled='true', value='Reject...')
@@ -16,7 +16,7 @@
     input#hold(type='button', disabled='true', value='Place on Hold...')
     input#retrieve(type='button', disabled='true', value='Retrieve Call...')
     | Transfer Number:
-    input#transfer_number(type='text')
+    input#transfer_number(type='text', value='2142955780')
     input#transfer(type='button', disabled='true', value='Transfer...')
 
   include footer.jade
@@ -199,10 +199,12 @@ script
   });
 
   $("#transfer").click(function(event) {
-    var number = $("#transfer_number").val();
+    var tNumber = $("#transfer_number").val();
     call.hold(true);
-    call.transferto(number);
-    toIdleState();
+    setTimeout(function(){
+      call.transferto(tNumber);
+      toIdleState();
+    }, 5000);
   });
 
   $("#logout-btn").bind('click', function(e) {

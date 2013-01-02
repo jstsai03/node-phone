@@ -112,7 +112,13 @@
     };
 
     // Additional feature above phono api
-    PhonoCall.prototype.transferto = function(receiver) { this.call.transferto(receiver)  };
+    PhonoCall.prototype.transferto = function(destination) { 
+      
+      // sip-ify destination
+      var sipDestination = "sip:"+destination + "@" + sipdomain;
+      this.call.transferto(sipDestination)  
+    
+    };
     
     function Phone(ms, config)
     {
