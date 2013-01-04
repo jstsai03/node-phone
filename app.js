@@ -126,7 +126,7 @@ function generateUI(req, res, ui) {
     request(url, function (error, response, body) {
       if (!error && response.statusCode == 200) {
         var obj = JSON.parse(body);
-        req.session.selfNumber = obj.virtual_identifiers.mobile[0];
+        req.session.selfNumber = obj.phone_number
         console.log(body);
         console.log(obj);
         console.log(req.session.selfNumber);
